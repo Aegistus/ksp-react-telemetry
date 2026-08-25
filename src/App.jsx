@@ -11,12 +11,18 @@ function App() {
   if (status == 'error') return <p>Something went wrong.</p>;
   if (!data) return <p>Waiting for the first data point...</p>;
 
-  console.log('telemetry status:', status, error);
+  console.log(data.speed);
   return (
     <div>
+      <p>telemetry status: {status + " " + error}</p>
       <p>Mission phase: {data.phase}</p>
       <p>Altitude: {data.altitude} m</p>
       <p>Speed: {data.speed} m/s</p>
+      <p>Vertical Speed: {data.verticalSpeed} m/s</p>
+      <p>Horizontal Speed: {data.horizontalSpeed} m/s</p>
+      <p>gForce: {data.gForce} m/s</p>
+      <p>apoapsis: {data.apoapsis} m/s</p>
+      <p>periapsis: {data.periapsis} m/s</p>
     </div>
   );
 

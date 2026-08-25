@@ -9,11 +9,25 @@ async function main() {
 
   // Get the active vessel, its Flight telemetry object, and its Orbit object.
   const vesselId = Value.decodeUInt64(await krpc.call('SpaceCenter', 'get_ActiveVessel'));
-  const flightId = Value.decodeUInt64(
-    await krpc.call('SpaceCenter', 'Vessel_Flight', [Value.encodeUInt64(vesselId)])
-  );
   const orbitId = Value.decodeUInt64(
     await krpc.call('SpaceCenter', 'Vessel_get_Orbit', [Value.encodeUInt64(vesselId)])
+  );
+
+  // Vessel_Flight's reference frame defaults to the vessel's own surface frame,
+  // which moves *with* the vessel — so speed/verticalSpeed/horizontalSpeed would
+  // always read 0. Use the orbited body's reference frame instead (fixed to the
+  // planet), which gives real ground-relative speed.
+  const bodyId = Value.decodeUInt64(
+    await krpc.call('SpaceCenter', 'Orbit_get_Body', [Value.encodeUInt64(orbitId)])
+  );
+  const refFrameId = Value.decodeUInt64(
+    await krpc.call('SpaceCenter', 'CelestialBody_get_ReferenceFrame', [Value.encodeUInt64(bodyId)])
+  );
+  const flightId = Value.decodeUInt64(
+    await krpc.call('SpaceCenter', 'Vessel_Flight', [
+      Value.encodeUInt64(vesselId),
+      Value.encodeUInt64(refFrameId),
+    ])
   );
 
   // Field name -> [procedure, target object id, decoder]
