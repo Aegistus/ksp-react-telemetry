@@ -27,7 +27,7 @@ function decodeVarint(buf, offset) {
   let shift = 0;
   let pos = offset;
   for (;;) {
-    if (pos >= buf.length) throw new Error('incomplete varint');
+    if (pos >= buf.length) throw new Error('incomplete varint ');
     const byte = buf[pos++];
     result += (byte & 0x7f) * Math.pow(2, shift);
     if ((byte & 0x80) === 0) break;
@@ -111,6 +111,7 @@ async function connectKRPC(clientName = 'Telemetry Bridge') {
   const Request = root.lookupType('krpc.schema.Request');
   const Response = root.lookupType('krpc.schema.Response');
   const StreamUpdate = root.lookupType('krpc.schema.StreamUpdate');
+  const StreamMsg = root.lookupType('krpc.schema.Stream');
 
   // --- RPC connection & handshake ---
   const rpcSocket = await connectSocket(RPC_PORT);
@@ -150,8 +151,8 @@ async function connectKRPC(clientName = 'Telemetry Bridge') {
     const callMsg = ProcedureCall.create({
       service, procedure, arguments: args.map((value, position) => ({ position, value })),
     });
-    const streamRef = await call('KRPC', 'AddStream', [ProcedureCall.encode(callMsg).finish()]);
-    return Value.decodeUInt64(streamRef);
+    const streamRefBytes = await call('KRPC', 'AddStream', [ProcedureCall.encode(callMsg).finish()]);
+    return StreamMsg.decode(streamRefBytes).id.toString();
   }
 
   // Fires handler(results) for every StreamUpdate frame, forever.

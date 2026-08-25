@@ -42,7 +42,7 @@ async function main() {
 
   krpc.onStreamUpdate((results) => {
     for (const r of results) {
-      const field = idToField[r.id];
+      const field = idToField[r.id.toString()];
       if (!field || r.result.isNull) continue;
       latest[field] = decoders[field](r.result.value);
     }

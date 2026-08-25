@@ -85,7 +85,10 @@ function runLiveSource(url, pushSnapshot, setStatus, setError) {
 
   function connect() {
     socket = new WebSocket(url);
-    socket.onopen = () => setStatus('connected');
+    socket.onopen = () => {
+      setStatus('connected');
+      setError(null);
+    };    
     socket.onmessage = (event) => {
       try {
         pushSnapshot(JSON.parse(event.data));

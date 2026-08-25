@@ -68,6 +68,10 @@ message StreamResult {
   ProcedureResult result = 2;
 }
 
+message Stream {
+  uint64 id = 1;
+}
+
 // ---- Service introspection (used only by the listServices() debug helper) ----
 
 message Services {
