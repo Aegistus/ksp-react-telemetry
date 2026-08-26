@@ -4,6 +4,16 @@ const WebSocket = require('ws');
 
 const WS_PORT = 8765;
 
+// Helper decoder for 3D Vector tuples returned by kRPC (3 doubles)
+function decodeVector3(buf) {
+  // Decode 3 consecutive 64-bit doubles (X, Y, Z)
+  return [
+    buf.readDoubleLE(0),
+    buf.readDoubleLE(8),
+    buf.readDoubleLE(16)
+  ];
+}
+
 async function main() {
   const krpc = await connectKRPC();
 
@@ -30,6 +40,16 @@ async function main() {
     ])
   );
 
+  // Get Resources reference for LiquidFuel
+  const resourcesId = Value.decodeUInt64(
+    await krpc.call('SpaceCenter', 'Vessel_get_Resources', [Value.encodeUInt64(vesselId)])
+  );
+
+  // // Get Control reference for DeltaV
+  // const controlId = Value.decodeUInt64(
+  //   await krpc.call('SpaceCenter', 'Vessel_get_Control', [Value.encodeUInt64(vesselId)])
+  // );
+
   // Field name -> [procedure, target object id, decoder]
   const fields = {
     altitude: ['Flight_get_MeanAltitude', flightId, Value.decodeDouble],
@@ -39,6 +59,13 @@ async function main() {
     gForce: ['Flight_get_GForce', flightId, Value.decodeFloat],
     apoapsis: ['Orbit_get_ApoapsisAltitude', orbitId, Value.decodeDouble],
     periapsis: ['Orbit_get_PeriapsisAltitude', orbitId, Value.decodeDouble],
+
+    // NEW Telemetry Fields
+    position: ['Flight_get_CenterOfMass', flightId, decodeVector3],
+    direction: ['Flight_get_Direction', flightId, decodeVector3],
+    // deltaV: ['Control_get_DeltaV', controlId, Value.decodeFloat],
+    currentFuel: ['Resources_Amount', resourcesId, Value.decodeDouble],
+    maxFuel: ['Resources_Max', resourcesId, Value.decodeDouble],
   };
 
   const idToField = {};

@@ -218,7 +218,7 @@ function createSimulatedLaunch() {
       gForce: s.lastAccelG,
       apoapsis: orbit.apoapsis,
       periapsis: orbit.periapsis,
-      phase: s.phase,
+      phase: s.phase,      
     };
   }
 
