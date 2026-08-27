@@ -1,3 +1,4 @@
+
 .widget-panel
 {
   background-color: rgba(17, 40, 72);
@@ -6,13 +7,40 @@
 }
 .widget-panel h1
 {
-  font-family: 'Robot Mono', sans-serif;
+  font-family: 'Roboto Mono', monospace;
   color: rgba(255, 127, 0);
   padding: 10px 10px 5px 10px;
   border-bottom: 1px solid rgba(255, 127, 0);
 }
 
 p
+{
+  color: white;
+  font-family: 'Roboto Mono', monospace;
+}
+
+td
+{
+  font-family: 'Roboto Mono', monospace;
+  color: rgba(255, 127, 0);
+  padding: 10px 10px 5px 10px;
+  border: 1px solid rgba(255, 127, 0);
+}
+
+.parent-element
+{
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.readout-title
+{
+  color: rgba(255, 127, 0);
+}
+
+.readout-value
 {
   color: white;
 }

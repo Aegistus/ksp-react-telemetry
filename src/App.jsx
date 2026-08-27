@@ -1,21 +1,72 @@
 import { useState } from 'react'
 import './App.css'
 import WidgetPanel from './WidgetPanel.jsx'
+import ValueReadout from './ValueReadout.jsx'
 import Hero from "./assets/hero.png"
 import { useKspTelemetry } from './useKspTelemetry.js'
 import CesiumViewer from './CesiumViewer.jsx'
 
+const defaultData = 
+{
+  altitude: 0,
+  speed: 0,
+  verticalSpeed: 0,
+  horizontalSpeed: 0,
+  gForce: 0,
+  apoapsis: 0,
+  periapsis: 0,
+  phase: 0,
+  latitude: 0,
+  longitude: 0,
+  direction: 0,
+  pitch: 0,
+  roll: 0,
+  heading: 0,
+  deltaV: 0,
+  name: 0,
+  stages: 0,
+  missionTime: 0,
+  universalTime: 0,
+
+}
+
+function formatTime(t) {
+  const sign = t < 0 ? "-" : "+";
+  const at = Math.abs(Math.round(t));
+  const h = Math.floor(at / 3600).toString().padStart(2, "0");
+  const m = Math.floor((at % 3600) / 60).toString().padStart(2, "0");
+  const s = (at % 60).toString().padStart(2, "0");
+  return `T${sign}${h}:${m}:${s}`;
+}
 
 function App() {
   const { status, data, error } = useKspTelemetry({ source: 'demo'});
+  let connectionStatus = "Connected"
+  let currentData = data;
 
-  if (status == 'connecting') return <p>Connecting...</p>;
-  if (status == 'error') return <p>Something went wrong.</p>;
-  if (!data) return <p>Waiting for the first data point...</p>;
+  if (status == 'connecting') 
+  {
+    connectionStatus = "Connecting...";
+    currentData = defaultData;
+  }
+  if (status == 'error') 
+  {
+    connectionStatus = "Something went wrong.";
+    currentData = defaultData;
+  }
+  if (!data) 
+  {
+    connectionStatus = "Waiting for the first data point...";
+    currentData = defaultData;
+  }
 
   return (
     <div>
-      <CesiumViewer longitude={data.longitude} latitude={data.latitude} altitude={data.altitude}/>
+      <p>Connection Status: {connectionStatus}</p>
+      <ValueReadout title="MET"> 
+        { formatTime(currentData.missionTime) }
+      </ValueReadout>
+      {/* <CesiumViewer longitude={data.longitude} latitude={data.latitude} altitude={data.altitude}/>
       <p>telemetry status: {status + " " + error}</p>
       <p>Mission phase: {data.phase}</p>
       <p>Altitude: {data.altitude} m</p>
@@ -30,7 +81,7 @@ function App() {
       <p>Horizontal Speed: {data.horizontalSpeed} m/s</p>
       <p>gForce: {data.gForce} m/s</p>
       <p>apoapsis: {data.apoapsis} m/s</p>
-      <p>periapsis: {data.periapsis} m/s</p>
+      <p>periapsis: {data.periapsis} m/s</p> */}
     </div>
   );
 

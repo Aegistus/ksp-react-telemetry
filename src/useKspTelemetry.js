@@ -32,6 +32,8 @@ export const TELEMETRY_FIELDS = {
   deltaV: { label: 'Delta-V', unit: 'm/s' },
   name: { label: 'Vessel Name', unit: '' },
   stages: { label: 'Stage Numbers', unit: '' },
+  missionTime: { label: 'Mission Elapsed Time', unit: 's' },
+  universalTime: { label: 'Universal Time', unit: 's' },
 };
 
 const MAX_HISTORY = 600;
@@ -52,7 +54,7 @@ const RECONNECT_DELAY_MS = 2000;
  *   error: string|null,
  * }}
  */
-export function useKspTelemetry({ url = 'ws://localhost:8765', source = 'live', demoSpeed = 1 } = {}) {
+export function useKspTelemetry({ url = 'ws://localhost:8765', source = 'live', demoSpeed = 2 } = {}) {
   const [status, setStatus] = useState('connecting');
   const [data, setData] = useState(null);
   const [history, setHistory] = useState([]);
@@ -249,6 +251,8 @@ function createSimulatedLaunch() {
       deltaV: Math.max(0, 4500 - s.deltaVSpent),
       name: 'Simulated Vessel',
       stages: s.phase === 'STANDBY' || s.phase === 'ASCENT_S1' ? [1, 0] : [0],
+      missionTime: s.t, // demo mode's mission clock already starts at liftoff, same meaning as live MET
+      universalTime: 3600 * 24 * 120 + s.t, // an arbitrary "day 120 of the game" epoch — decorative only
     };
   }
 

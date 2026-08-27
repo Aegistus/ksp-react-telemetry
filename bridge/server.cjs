@@ -30,29 +30,33 @@ async function main() {
     ])
   );
 
-  // Field name -> [procedure, target object id, decoder]
+  // Field name -> [procedure, argument bytes, decoder]
+  // Most calls take one object-id argument; get_UT is a bare service-level
+  // call with none at all, hence the mix of encodeUInt64(...) and [].
   const fields = {
-    altitude: ['Flight_get_MeanAltitude', flightId, Value.decodeDouble],
-    speed: ['Flight_get_Speed', flightId, Value.decodeDouble],
-    verticalSpeed: ['Flight_get_VerticalSpeed', flightId, Value.decodeDouble],
-    horizontalSpeed: ['Flight_get_HorizontalSpeed', flightId, Value.decodeDouble],
-    gForce: ['Flight_get_GForce', flightId, Value.decodeFloat],
-    apoapsis: ['Orbit_get_ApoapsisAltitude', orbitId, Value.decodeDouble],
-    periapsis: ['Orbit_get_PeriapsisAltitude', orbitId, Value.decodeDouble],
-    latitude: ['Flight_get_Latitude', flightId, Value.decodeDouble],
-    longitude: ['Flight_get_Longitude', flightId, Value.decodeDouble],
-    direction: ['Flight_get_Direction', flightId, Value.decodeVector],
-    pitch: ['Flight_get_Pitch', flightId, Value.decodeFloat],
-    roll: ['Flight_get_Roll', flightId, Value.decodeFloat],
-    heading: ['Flight_get_Heading', flightId, Value.decodeFloat],
-    deltaV: ['Vessel_get_DeltaV', vesselId, Value.decodeFloat],
-    stageIds: ['Vessel_get_Stages', vesselId, Value.decodeObjectList],
+    altitude: ['Flight_get_MeanAltitude', [Value.encodeUInt64(flightId)], Value.decodeDouble],
+    speed: ['Flight_get_Speed', [Value.encodeUInt64(flightId)], Value.decodeDouble],
+    verticalSpeed: ['Flight_get_VerticalSpeed', [Value.encodeUInt64(flightId)], Value.decodeDouble],
+    horizontalSpeed: ['Flight_get_HorizontalSpeed', [Value.encodeUInt64(flightId)], Value.decodeDouble],
+    gForce: ['Flight_get_GForce', [Value.encodeUInt64(flightId)], Value.decodeFloat],
+    apoapsis: ['Orbit_get_ApoapsisAltitude', [Value.encodeUInt64(orbitId)], Value.decodeDouble],
+    periapsis: ['Orbit_get_PeriapsisAltitude', [Value.encodeUInt64(orbitId)], Value.decodeDouble],
+    latitude: ['Flight_get_Latitude', [Value.encodeUInt64(flightId)], Value.decodeDouble],
+    longitude: ['Flight_get_Longitude', [Value.encodeUInt64(flightId)], Value.decodeDouble],
+    direction: ['Flight_get_Direction', [Value.encodeUInt64(flightId)], Value.decodeVector],
+    pitch: ['Flight_get_Pitch', [Value.encodeUInt64(flightId)], Value.decodeFloat],
+    roll: ['Flight_get_Roll', [Value.encodeUInt64(flightId)], Value.decodeFloat],
+    heading: ['Flight_get_Heading', [Value.encodeUInt64(flightId)], Value.decodeFloat],
+    deltaV: ['Vessel_get_DeltaV', [Value.encodeUInt64(vesselId)], Value.decodeFloat],
+    stageIds: ['Vessel_get_Stages', [Value.encodeUInt64(vesselId)], Value.decodeObjectList],
+    missionTime: ['Vessel_get_MET', [Value.encodeUInt64(vesselId)], Value.decodeDouble],
+    universalTime: ['get_UT', [], Value.decodeDouble],
   };
 
   const idToField = {};
   const decoders = {};
-  for (const [field, [procedure, objectId, decoder]] of Object.entries(fields)) {
-    const streamId = await krpc.addStream('SpaceCenter', procedure, [Value.encodeUInt64(objectId)]);
+  for (const [field, [procedure, args, decoder]] of Object.entries(fields)) {
+    const streamId = await krpc.addStream('SpaceCenter', procedure, args);
     idToField[streamId] = field;
     decoders[field] = decoder;
     console.log(`[bridge] streaming ${field} (SpaceCenter.${procedure}) as stream #${streamId}`);
@@ -96,7 +100,10 @@ async function main() {
       if (field === 'stageIds') resolveStageNumbers(latest.stageIds); // fire-and-forget
     }
     const { stageIds, ...visible } = latest; // stageIds is internal; send resolved numbers instead
-    const payload = JSON.stringify({ t: Date.now() / 1000, ...visible, stages: stageNumbers });
+    // "receivedAt" is this bridge's own wall-clock time — for latency/debugging
+    // only. For time since launch, use missionTime; for the game's own clock,
+    // use universalTime — both come straight from KSP itself.
+    const payload = JSON.stringify({ receivedAt: Date.now() / 1000, ...visible, stages: stageNumbers });
     for (const client of wss.clients) {
       if (client.readyState === WebSocket.OPEN) client.send(payload);
     }
