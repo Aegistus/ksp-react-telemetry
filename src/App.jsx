@@ -3,7 +3,7 @@ import './App.css'
 import WidgetPanel from './WidgetPanel.jsx'
 import ValueReadout from './ValueReadout.jsx'
 import Hero from "./assets/hero.png"
-import { useKspTelemetry } from './useKspTelemetry.js'
+import { useKspTelemetry, TELEMETRY_FIELDS } from './useKspTelemetry.js'
 import CesiumViewer from './CesiumViewer.jsx'
 
 const defaultData = 
@@ -38,6 +38,10 @@ function formatTime(t) {
   return `T${sign}${h}:${m}:${s}`;
 }
 
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
+}
+
 function App() {
   const { status, data, error } = useKspTelemetry({ source: 'demo'});
   let connectionStatus = "Connected"
@@ -62,12 +66,17 @@ function App() {
   return (
     <div>
       <p>Connection Status: {connectionStatus}</p>
-      <WidgetPanel>
+      <WidgetPanel title= "Basic Info">
         <ValueReadout title="Vessel Name">
           { currentData.name }
         </ValueReadout>
         <ValueReadout title="MET"> 
           { formatTime(currentData.missionTime) }
+        </ValueReadout>
+      </WidgetPanel>
+      <WidgetPanel title="Telemetry">
+        <ValueReadout title="Altitude" units= {TELEMETRY_FIELDS.altitude.unit}>
+          { numberWithCommas(currentData.altitude.toFixed(2)) }
         </ValueReadout>
       </WidgetPanel>
       {/* <CesiumViewer longitude={data.longitude} latitude={data.latitude} altitude={data.altitude}/>

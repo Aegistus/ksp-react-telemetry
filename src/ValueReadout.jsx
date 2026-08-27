@@ -6,7 +6,10 @@ function ValueReadout(props)
             <thead>
                 <tr>
                     <td className="readout-title">{props.title}</td>
-                    <td className="readout-value">{props.children}</td>
+                    <td className="readout-value">
+                        <p> {props.children} </p>
+                        <p className="units"> {props.units } </p>
+                    </td>
                 </tr>
             </thead>
         </table>

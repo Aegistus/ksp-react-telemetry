@@ -1,4 +1,9 @@
 
+body
+{
+  font-family: 'Roboto Mono', monospace;
+}
+
 .widget-panel
 {
   background-color: rgb(32, 32, 32);
@@ -15,8 +20,9 @@
 .widget-panel h1
 {
   font-family: 'Roboto Mono', monospace;
-  color: rgba(255, 127, 0);
-  padding: 10px 10px 5px 10px;
+  font-size:medium;
+  color: white;
+  padding: 0px 10px 5px 10px;
   border-bottom: 1px solid rgba(255, 127, 0);
 }
 
@@ -39,16 +45,33 @@ p
   color: rgba(255, 127, 0);
   min-width: 150px;
   font-family: 'Roboto Mono', monospace;
+  font-size: .8em;
   color: rgba(255, 127, 0);
-  padding: 10px 10px 5px 10px;
-  border: 1px solid rgb(88, 48, 7);
-  border-radius: 5px;
+  padding: 10px 10px 5px 0px;
+  text-align: right;
+  /* border: 1px solid rgb(88, 48, 7);
+  border-radius: 5px; */
 }
 
 .readout-value
 {
   padding: 10px;
   font-family: 'Roboto Mono', monospace;
+  font-size: 1.2em;
   color: white;
   min-width: 200px;
+  background-color:rgb(26, 26, 26);
+  border: 1px solid;
+  border-color: rgb(59, 58, 58);
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.units
+{
+  color: rgb(131, 129, 129);
+  padding: 0px 10px;
+  text-align:center;
 }
