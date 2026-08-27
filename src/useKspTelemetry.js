@@ -52,7 +52,7 @@ const RECONNECT_DELAY_MS = 2000;
  *   error: string|null,
  * }}
  */
-export function useKspTelemetry({ url = 'ws://localhost:8765', source = 'live', demoSpeed = 2 } = {}) {
+export function useKspTelemetry({ url = 'ws://localhost:8765', source = 'live', demoSpeed = 1 } = {}) {
   const [status, setStatus] = useState('connecting');
   const [data, setData] = useState(null);
   const [history, setHistory] = useState([]);
