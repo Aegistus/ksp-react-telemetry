@@ -23,11 +23,10 @@ const defaultData =
   roll: 0,
   heading: 0,
   deltaV: 0,
-  name: 0,
+  name: "N/A",
   stages: 0,
   missionTime: 0,
   universalTime: 0,
-
 }
 
 function formatTime(t) {
@@ -63,9 +62,14 @@ function App() {
   return (
     <div>
       <p>Connection Status: {connectionStatus}</p>
-      <ValueReadout title="MET"> 
-        { formatTime(currentData.missionTime) }
-      </ValueReadout>
+      <WidgetPanel>
+        <ValueReadout title="Vessel Name">
+          { currentData.name }
+        </ValueReadout>
+        <ValueReadout title="MET"> 
+          { formatTime(currentData.missionTime) }
+        </ValueReadout>
+      </WidgetPanel>
       {/* <CesiumViewer longitude={data.longitude} latitude={data.latitude} altitude={data.altitude}/>
       <p>telemetry status: {status + " " + error}</p>
       <p>Mission phase: {data.phase}</p>
