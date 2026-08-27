@@ -4,7 +4,7 @@
   "description": "Thin kRPC-to-WebSocket telemetry bridge for KSP",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.cjs"
   },
   "dependencies": {
     "protobufjs": "^7.2.5",

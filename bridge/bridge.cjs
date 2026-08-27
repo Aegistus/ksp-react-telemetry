@@ -27,7 +27,7 @@ function decodeVarint(buf, offset) {
   let shift = 0;
   let pos = offset;
   for (;;) {
-    if (pos >= buf.length) throw new Error('incomplete varint ');
+    if (pos >= buf.length) throw new Error('incomplete varint');
     const byte = buf[pos++];
     result += (byte & 0x7f) * Math.pow(2, shift);
     if ((byte & 0x80) === 0) break;
@@ -50,6 +50,43 @@ const Value = {
     const { value: len, next } = decodeVarint(buf, 0);
     return buf.slice(next, next + len).toString('utf8');
   },
+  encodeString: (str) => {
+    const utf8 = Buffer.from(str, 'utf8');
+    return Buffer.concat([encodeVarint(utf8.length), utf8]);
+  },
+  // proto3 sint32 uses zigzag encoding, not a plain varint — decode accordingly.
+  decodeSInt32: (buf) => {
+    const raw = decodeVarint(buf, 0).value;
+    return (raw >>> 1) ^ -(raw & 1);
+  },
+  // Tuple and List values are both wire-identical: a message wrapping
+  // `repeated bytes items`, where each item is itself a raw scalar/object-id
+  // encoding. This unwraps that envelope into an array of item byte-buffers;
+  // callers then decode each item with whatever scalar decoder fits.
+  decodeItems: (buf) => {
+    const items = [];
+    let pos = 0;
+    while (pos < buf.length) {
+      const tag = decodeVarint(buf, pos); // field 1, wire type 2 (length-delimited)
+      pos = tag.next;
+      const { value: len, next } = decodeVarint(buf, pos);
+      pos = next;
+      items.push(buf.slice(pos, pos + len));
+      pos += len;
+    }
+    return items;
+  },
+  // A TUPLE(DOUBLE, DOUBLE, DOUBLE) — e.g. Direction, Position — as {x, y, z}.
+  decodeVector: (buf) => {
+    const items = Value.decodeItems(buf);
+    return {
+      x: Value.decodeDouble(items[0]),
+      y: Value.decodeDouble(items[1]),
+      z: Value.decodeDouble(items[2]),
+    };
+  },
+  // A LIST(CLASS(...)) — e.g. Vessel_get_Stages — as an array of object ids.
+  decodeObjectList: (buf) => Value.decodeItems(buf).map(Value.decodeUInt64),
 };
 
 // ---- framed TCP reader -----------------------------------------------------
@@ -147,6 +184,11 @@ async function connectKRPC(clientName = 'Telemetry Bridge') {
   }
 
   // AddStream's argument is a serialized ProcedureCall for the thing to stream.
+  // Its return value is itself a serialized Stream message ({ id }), not a bare
+  // scalar — decode it as a message, and normalize the id to a string, since
+  // protobufjs represents uint64 fields as Long objects rather than plain
+  // numbers (keeping both sides as strings avoids any mismatch when the id
+  // is used as an object key).
   async function addStream(service, procedure, args = []) {
     const callMsg = ProcedureCall.create({
       service, procedure, arguments: args.map((value, position) => ({ position, value })),

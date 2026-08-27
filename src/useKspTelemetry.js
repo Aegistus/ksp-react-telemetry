@@ -23,6 +23,15 @@ export const TELEMETRY_FIELDS = {
   apoapsis: { label: 'Apoapsis Altitude', unit: 'm' },
   periapsis: { label: 'Periapsis Altitude', unit: 'm' },
   phase: { label: 'Mission Phase', unit: '' },
+  latitude: { label: 'Latitude', unit: '°' },
+  longitude: { label: 'Longitude', unit: '°' },
+  direction: { label: 'Direction', unit: 'vector' },
+  pitch: { label: 'Pitch', unit: '°' },
+  roll: { label: 'Roll', unit: '°' },
+  heading: { label: 'Heading', unit: '°' },
+  deltaV: { label: 'Delta-V', unit: 'm/s' },
+  name: { label: 'Vessel Name', unit: '' },
+  stages: { label: 'Stage Numbers', unit: '' },
 };
 
 const MAX_HISTORY = 600;
@@ -88,7 +97,7 @@ function runLiveSource(url, pushSnapshot, setStatus, setError) {
     socket.onopen = () => {
       setStatus('connected');
       setError(null);
-    };    
+    };
     socket.onmessage = (event) => {
       try {
         pushSnapshot(JSON.parse(event.data));
@@ -130,7 +139,7 @@ function createSimulatedLaunch() {
   const TARGET_AP = 80000;
   const ATMO_TOP = 70000;
 
-  let s = { t: 0, pos: { x: 0, y: R }, vel: { x: 0, y: 0 }, phase: 'STANDBY', phaseEnterT: 0, stage2StartT: null, circBurnStartT: null, lastAccelG: 0 };
+  let s = { t: 0, pos: { x: 0, y: R }, vel: { x: 0, y: 0 }, phase: 'STANDBY', phaseEnterT: 0, stage2StartT: null, circBurnStartT: null, lastAccelG: 0, deltaVSpent: 0 };
 
   function computeOrbit(pos, vel) {
     const r = Math.hypot(pos.x, pos.y);
@@ -197,6 +206,7 @@ function createSimulatedLaunch() {
       s.pos.x += s.vel.x * h;
       s.pos.y += s.vel.y * h;
       s.lastAccelG = accel / G0;
+      s.deltaVSpent += accel * h; // rough proxy: thrust-time integral, not a true rocket-equation figure
     }
   }
 
@@ -209,6 +219,17 @@ function createSimulatedLaunch() {
     const horizontalSpeed = s.vel.x * horiz.x + s.vel.y * horiz.y;
     const speed = Math.hypot(s.vel.x, s.vel.y);
     const orbit = altitude > 5 ? computeOrbit(s.pos, s.vel) : { apoapsis: 0, periapsis: -R };
+
+    // This 2D physics model doesn't track true 3D orientation, so the fields
+    // below are reasonable decorative approximations for demo mode, not a
+    // physically simulated attitude — the live bridge gives you the real
+    // values from KSP's own Flight/Vessel objects instead.
+    const downrangeAngle = (Math.atan2(s.pos.x, s.pos.y) * 180) / Math.PI;
+    const direction = speed > 0.5
+      ? { x: s.vel.x / speed, y: s.vel.y / speed, z: 0 }
+      : { x: 0, y: 1, z: 0 };
+    const pitch = speed > 0.5 ? (Math.atan2(verticalSpeed, horizontalSpeed) * 180) / Math.PI : 90;
+
     return {
       t: s.t,
       altitude,
@@ -218,7 +239,16 @@ function createSimulatedLaunch() {
       gForce: s.lastAccelG,
       apoapsis: orbit.apoapsis,
       periapsis: orbit.periapsis,
-      phase: s.phase,      
+      phase: s.phase,
+      latitude: -0.0972, // KSC's real latitude — this sim only flies in one plane
+      longitude: -74.5 + downrangeAngle,
+      direction,
+      pitch,
+      roll: 0, // not modeled
+      heading: 90, // due east — the standard equatorial launch heading, not modeled dynamically
+      deltaV: Math.max(0, 4500 - s.deltaVSpent),
+      name: 'Simulated Vessel',
+      stages: s.phase === 'STANDBY' || s.phase === 'ASCENT_S1' ? [1, 0] : [0],
     };
   }
 

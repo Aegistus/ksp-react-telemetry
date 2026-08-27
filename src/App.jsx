@@ -7,7 +7,7 @@ import CesiumViewer from './CesiumViewer.jsx'
 
 
 function App() {
-  const { status, data, error } = useKspTelemetry({ source: 'demo'});
+  const { status, data, error } = useKspTelemetry({ source: 'live'});
 
   if (status == 'connecting') return <p>Connecting...</p>;
   if (status == 'error') return <p>Something went wrong.</p>;
@@ -20,6 +20,8 @@ function App() {
       <p>Mission phase: {data.phase}</p>
       <p>Altitude: {data.altitude} m</p>
       <p>Position: {data.position} m</p>
+      <p>Latitude: {data.latitude} </p>
+      <p>Longitude: {data.longitude} </p>
       <p>Speed: {data.speed} m/s</p>
       <p>Vertical Speed: {data.verticalSpeed} m/s</p>
       <p>Horizontal Speed: {data.horizontalSpeed} m/s</p>
