@@ -79,7 +79,9 @@ function App() {
           { numberWithCommas(currentData.altitude.toFixed(2)) }
         </ValueReadout>
       </WidgetPanel>
-      <LineGraph xData={history.map(h => h.missionTime)} yData={history.map(h => h.altitude)}/>
+      <WidgetPanel>
+        <LineGraph xData={history.map(h => h.missionTime)} yData={history.map(h => h.altitude)}/>
+      </WidgetPanel>
       {/* <CesiumViewer longitude={data.longitude} latitude={data.latitude} altitude={data.altitude}/>
       <p>telemetry status: {status + " " + error}</p>
       <p>Mission phase: {data.phase}</p>

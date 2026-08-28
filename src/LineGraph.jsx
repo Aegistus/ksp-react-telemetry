@@ -3,11 +3,12 @@ import './charts.css'
 
 function LineGraph(props)
 {
-
     return(
        <LineChart
             xAxis={[{ data: props.xData}]}
-            series={[{data: props.yData}]}
+            series={[{ curve: "linear", data: props.yData}]}
+            skipAnimation
+            width={1000}
             height={300}
         />
     );
