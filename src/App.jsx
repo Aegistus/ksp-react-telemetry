@@ -5,6 +5,7 @@ import ValueReadout from './ValueReadout.jsx'
 import Hero from "./assets/hero.png"
 import { useKspTelemetry, TELEMETRY_FIELDS } from './useKspTelemetry.js'
 import CesiumViewer from './CesiumViewer.jsx'
+import LineGraph from './LineGraph.jsx'
 
 const defaultData = 
 {
@@ -43,7 +44,7 @@ function numberWithCommas(x) {
 }
 
 function App() {
-  const { status, data, error } = useKspTelemetry({ source: 'demo'});
+  const { status, data, history, error } = useKspTelemetry({ source: 'demo', demoSpeed: .5});
   let connectionStatus = "Connected"
   let currentData = data;
 
@@ -62,7 +63,6 @@ function App() {
     connectionStatus = "Waiting for the first data point...";
     currentData = defaultData;
   }
-
   return (
     <div>
       <p>Connection Status: {connectionStatus}</p>
@@ -79,6 +79,7 @@ function App() {
           { numberWithCommas(currentData.altitude.toFixed(2)) }
         </ValueReadout>
       </WidgetPanel>
+      <LineGraph xData={history.map(h => h.missionTime)} yData={history.map(h => h.altitude)}/>
       {/* <CesiumViewer longitude={data.longitude} latitude={data.latitude} altitude={data.altitude}/>
       <p>telemetry status: {status + " " + error}</p>
       <p>Mission phase: {data.phase}</p>

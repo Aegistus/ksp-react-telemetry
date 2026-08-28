@@ -1,0 +1,14 @@
+
+svg .MuiChartsAxis-line
+{
+    stroke: white !important;
+    stroke-width: 2px !important;
+}
+
+svg .MuiChartsAxis-tick {
+  stroke: #ffffff !important;
+}
+
+svg .MuiChartsAxis-tickLabel {
+  fill: #ffffff !important;
+}
