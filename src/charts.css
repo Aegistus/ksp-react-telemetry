@@ -6,9 +6,30 @@ svg .MuiChartsAxis-line
 }
 
 svg .MuiChartsAxis-tick {
-  stroke: #ffffff !important;
+  stroke: #7a7a7a !important;
 }
 
 svg .MuiChartsAxis-tickLabel {
   fill: #ffffff !important;
+}
+
+svg .MuiChartsGrid-line
+{
+  stroke: rgb(85, 85, 85);  
+}
+
+svg .MuiChartsAxis-label
+{
+  stroke: rgb(196, 196, 196);
+}
+
+svg .MuiLineChart-line
+{
+  stroke: rgb(187, 93, 0);
+}
+
+svg .MuiLineChart-highlight
+{
+  stroke: rgba(255, 127, 0);
+  fill: rgba(255, 127, 0);
 }

@@ -1,18 +1,18 @@
 
-function WidgetPanel(props)
+function WidgetPanel({title = "", children})
 {
-    if (props.title == null)
+    if (title == null)
     {
         return(
             <div className="widget-panel">
-                {props.children}
+                {children}
             </div>
         );
     }
     return(
         <div className="widget-panel">
-            <h1 className="widget-title">{props.title}</h1>
-            {props.children}
+            <h1 className="widget-title">{title}</h1>
+            {children}
         </div>
     );
 
