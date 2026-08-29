@@ -44,7 +44,7 @@ function numberWithCommas(x) {
 }
 
 function App() {
-  const { status, data, history, error } = useKspTelemetry({ source: 'live', demoSpeed: .5});
+  let { status, data, history, error } = useKspTelemetry({ source: 'demo', demoSpeed: .5});
   let connectionStatus = "Connected"
   let currentData = data;
 
@@ -63,6 +63,12 @@ function App() {
     connectionStatus = "Waiting for the first data point...";
     currentData = defaultData;
   }
+  // // if launch hasn't started, ignore all but one history snapshot
+  // if (history.findLast(snapshot => snapshot.missionTime == 0))
+  // {
+  //   history = [history[0]];
+  // }
+  //console.log(history[0]);
   const longitude = data == null ? 0 : data.longitude;
   const latitude = data == null ? 0 : data.latitude;
   const altitude = data == null ? 0 : data.altitude;
@@ -83,7 +89,7 @@ function App() {
         </ValueReadout>
       </WidgetPanel>
       <WidgetPanel title="Altitude (m)">
-        <LineGraph xData={history.map(h => h.missionTime)} yData={history.map(h => h.altitude)} xLabel={"Time (s)"} yLabel={"Altitude (m)"} interval={5000}/>
+        <LineGraph dataSet={history} yDataKey={'altitude'} xLabel={"Time (s)"} yLabel={"Altitude (m)"} interval={5000}/>
       </WidgetPanel>
       <CesiumViewer history={history} longitude={longitude} latitude={latitude} altitude={altitude}/>
       {/* <p>telemetry status: {status + " " + error}</p>

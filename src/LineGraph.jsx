@@ -1,14 +1,17 @@
 import { LineChart } from '@mui/x-charts/LineChart';
 import './charts.css'
 
-function LineGraph({xData = [], yData = [], interval = 1, xLabel="", yLabel = ""})
+
+function LineGraph({dataSet={}, yDataKey="", interval = 1, xLabel="", yLabel = ""})
 {
-    const dataMax = yData && yData.length > 0 ? Math.max(...yData) : 1000;
+    const dataMax = dataSet.length > 0 ? Math.max(...dataSet.map((point) => point[yDataKey])) : 1000;
     const axisMax = Math.ceil(dataMax / interval) * interval;
+    //const axisMax = 10000;
     return(
        <LineChart
+            dataset={dataSet}
             xAxis={[{ 
-                data: xData,
+                dataKey:"missionTime",
                 label: xLabel,
             }]}
             yAxis={[{ 
@@ -18,9 +21,9 @@ function LineGraph({xData = [], yData = [], interval = 1, xLabel="", yLabel = ""
                 label: yLabel
             }]}
             series={[{
+                dataKey: yDataKey,
                 curve: "linear",
                 showMark: 'end',
-                data: yData,
             }]}
             skipAnimation
             grid={{vertical: true, horizontal: true}}

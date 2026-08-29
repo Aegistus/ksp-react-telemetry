@@ -66,10 +66,12 @@ export function useKspTelemetry({ url = 'ws://localhost:8765', source = 'live', 
     setHistory([]);
     setError(null);
 
+    let seq = 0;
     const pushSnapshot = (snapshot) => {
-      setData(snapshot);
+      const withSeq = { ...snapshot, seq: seq++ }; // guaranteed-unique, ever-increasing — safe as a React key
+      setData(withSeq);
       setHistory((prev) => {
-        const next = [...prev, snapshot];
+        const next = [...prev, withSeq];
         return next.length > MAX_HISTORY ? next.slice(next.length - MAX_HISTORY) : next;
       });
     };

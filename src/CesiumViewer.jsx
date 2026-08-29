@@ -11,7 +11,7 @@ function CesiumViewer({history, longitude, latitude, altitude})
 {
     const pastPointColor = new Color(1.0, .498, 0, .5); // CoAspire orange remapped from 0-1
     const pastPositions = history != null ? history.map(h => 
-        <Entity key={h.missionTime} position={Cartesian3.fromDegrees(h.longitude, h.latitude, h.altitude)}>
+        <Entity key={h.seq} position={Cartesian3.fromDegrees(h.longitude, h.latitude, h.altitude)}>
             <PointGraphics pixelSize={2} color={pastPointColor}/>
         </Entity>
     ) : [];
