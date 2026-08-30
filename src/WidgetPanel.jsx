@@ -1,7 +1,7 @@
 
 function WidgetPanel({title = "", children})
 {
-    if (title == null)
+    if (title == null || title === "")
     {
         return(
             <div className="widget-panel">

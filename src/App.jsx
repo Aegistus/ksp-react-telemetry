@@ -2,10 +2,10 @@ import { useState } from 'react'
 import './App.css'
 import WidgetPanel from './WidgetPanel.jsx'
 import ValueReadout from './ValueReadout.jsx'
-import Hero from "./assets/hero.png"
 import { useKspTelemetry, TELEMETRY_FIELDS } from './useKspTelemetry.js'
 import CesiumViewer from './CesiumViewer.jsx'
 import LineGraph from './LineGraph.jsx'
+import SourceButton from './SourceButton.jsx'
 
 const defaultData = 
 {
@@ -44,7 +44,8 @@ function numberWithCommas(x) {
 }
 
 function App() {
-  let { status, data, history, error } = useKspTelemetry({ source: 'demo', demoSpeed: .5});
+  let [source, setSource] = useState('live');
+  let { status, data, history, error } = useKspTelemetry({ source: source, demoSpeed: .5});
   let connectionStatus = "Connected"
   let currentData = data;
 
@@ -74,6 +75,9 @@ function App() {
   const altitude = data == null ? 0 : data.altitude;
   return (
     <div>
+      <WidgetPanel>
+        <SourceButton currentSource={source} setSource={setSource}/>
+      </WidgetPanel>
       <p>Connection Status: {connectionStatus}</p>
       <WidgetPanel title= "Basic Info">
         <ValueReadout title="Vessel Name">
@@ -88,10 +92,10 @@ function App() {
           { numberWithCommas(currentData.altitude.toFixed(2)) }
         </ValueReadout>
       </WidgetPanel>
-      {/* <WidgetPanel title="Altitude (m)">
+      <WidgetPanel title="Altitude (m)">
         <LineGraph dataSet={history} yDataKey={'altitude'} xLabel={"Time (s)"} yLabel={"Altitude (m)"} interval={5000}/>
-      </WidgetPanel> */}
-      <CesiumViewer history={history} longitude={longitude} latitude={latitude} altitude={altitude}/>
+      </WidgetPanel>
+      {/* <CesiumViewer history={history} longitude={longitude} latitude={latitude} altitude={altitude}/> */}
       {/* <p>telemetry status: {status + " " + error}</p>
       <p>Mission phase: {data.phase}</p>
       <p>Altitude: {data.altitude} m</p>
