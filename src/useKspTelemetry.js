@@ -46,6 +46,12 @@ const RECONNECT_DELAY_MS = 2000;
  *   so you can build your UI without KSP or the bridge running at all.
  * @param {string} [options.url='ws://localhost:8765'] - only used in 'live' mode.
  * @param {number} [options.demoSpeed=2] - time-warp multiplier for 'demo' mode.
+ * @param {number} [options.minUpdateIntervalMs=100] - only used in 'live' mode.
+ *   kRPC can push updates far faster than any UI needs to redraw (hundreds of
+ *   times a second) — messages arriving sooner than this after the last
+ *   processed one are dropped before parsing, so the actual update rate is
+ *   capped regardless of how fast the bridge sends data. 100ms matches demo
+ *   mode's fixed cadence, keeping the two visually consistent by default.
  *
  * @returns {{
  *   status: 'connecting'|'connected'|'disconnected'|'error',
@@ -54,7 +60,12 @@ const RECONNECT_DELAY_MS = 2000;
  *   error: string|null,
  * }}
  */
-export function useKspTelemetry({ url = 'ws://localhost:8765', source = 'live', demoSpeed = 2 } = {}) {
+export function useKspTelemetry({
+  url = 'ws://localhost:8765',
+  source = 'live',
+  demoSpeed = 2,
+  minUpdateIntervalMs = 100,
+} = {}) {
   const [status, setStatus] = useState('connecting');
   const [data, setData] = useState(null);
   const [history, setHistory] = useState([]);
@@ -79,8 +90,8 @@ export function useKspTelemetry({ url = 'ws://localhost:8765', source = 'live', 
     if (source === 'demo') {
       return runDemoSource(pushSnapshot, setStatus, demoSpeed);
     }
-    return runLiveSource(url, pushSnapshot, setStatus, setError);
-  }, [url, source, demoSpeed]);
+    return runLiveSource(url, pushSnapshot, setStatus, setError, minUpdateIntervalMs);
+  }, [url, source, demoSpeed, minUpdateIntervalMs]);
 
   return { status, data, history, error };
 }
@@ -91,10 +102,11 @@ export function useKspTelemetry({ url = 'ws://localhost:8765', source = 'live', 
 // transparent, not because you need to touch it.
 // ---------------------------------------------------------------------------
 
-function runLiveSource(url, pushSnapshot, setStatus, setError) {
+function runLiveSource(url, pushSnapshot, setStatus, setError, minUpdateIntervalMs) {
   let socket;
   let reconnectTimer;
   let cancelled = false;
+  let lastProcessedAt = 0; // timestamp (ms) of the last message actually processed, not just received
 
   function connect() {
     socket = new WebSocket(url);
@@ -103,6 +115,16 @@ function runLiveSource(url, pushSnapshot, setStatus, setError) {
       setError(null);
     };
     socket.onmessage = (event) => {
+      // Check the throttle BEFORE parsing — a dropped message should cost as
+      // close to nothing as possible. kRPC can send hundreds of updates per
+      // second; without this, every single one would trigger a JSON.parse
+      // plus a full pushSnapshot (state update, history array rebuild,
+      // re-render), regardless of whether any UI could actually show the
+      // difference between two updates 1ms apart.
+      const now = performance.now();
+      if (now - lastProcessedAt < minUpdateIntervalMs) return;
+      lastProcessedAt = now;
+
       try {
         pushSnapshot(JSON.parse(event.data));
       } catch {
