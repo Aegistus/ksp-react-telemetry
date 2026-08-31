@@ -26,18 +26,21 @@ function ChartsWidget({history})
                     series={[
                         {
                             dataKey: "speed",
+                            label: "Total Velocity",
                             curve: "linear",
                             showMark: "end",
                             color: "#EFCA08"
                         },
                         {
                             dataKey: "verticalSpeed",
+                            label: "Vertical Velocity",
                             curve: "linear",
                             showMark: "end",
                             color: "#6B7FD7"
                         },
                         {
                             dataKey: "horizontalSpeed",
+                            label: "Horizontal Velocity",
                             curve: "linear",
                             showMark: "end",
                             color: "#588157"
@@ -47,9 +50,14 @@ function ChartsWidget({history})
                     grid={{vertical: true, horizontal: true}}
                     width={1000}
                     height={300}
+                    sx={{
+                        '& .MuiChartsLegend-root':
+                        {
+                            color: "#FFFFFF"
+                        }
+                    }}
                 />
             </WidgetPanel>
-
         </>
     );
 }
