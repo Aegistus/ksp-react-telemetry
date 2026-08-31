@@ -24,6 +24,7 @@ function LineGraph({dataSet={}, yDataKey="", interval = 1, xLabel="", yLabel = "
                 dataKey: yDataKey,
                 curve: "linear",
                 showMark: 'end',
+                color: "#FF7A00"
             }]}
             skipAnimation
             grid={{vertical: true, horizontal: true}}

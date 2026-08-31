@@ -10,6 +10,7 @@ import BasicInfoWidget from './BasicInfoWidget.jsx'
 import TelemetryWidget from './TelemetryWidget.jsx'
 import OrbitInfoWidget from './OrbitInfoWidget.jsx'
 import DirectionWidget from './DirectionWidget.jsx'
+import ChartsWidget from './ChartsWidget.jsx'
 
 const defaultData = 
 {
@@ -95,12 +96,7 @@ function App() {
               <TelemetryWidget currentData={currentData}/>
             </td>
             <td className="main-table">
-              <WidgetPanel title="Altitude (m)">
-                <LineGraph dataSet={history} yDataKey={'altitude'} xLabel={"Time (s)"} yLabel={"Altitude (m)"} interval={5000}/>
-              </WidgetPanel>
-              <WidgetPanel title="Delta-V (m/s)">
-                <LineGraph dataSet={history} yDataKey={'deltaV'} xLabel={"Time (s)"} yLabel={"Delta-V (m/s)"} interval={100}/>
-              </WidgetPanel>
+              <ChartsWidget history={history}/>
             </td>
           </tr>
         </thead>

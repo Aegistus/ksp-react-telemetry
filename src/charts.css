@@ -23,7 +23,7 @@ svg .MuiChartsAxis-label
   stroke: rgb(196, 196, 196);
 }
 
-svg .MuiLineChart-line
+/* svg .MuiLineChart-line
 {
   stroke: rgb(187, 93, 0);
 }
@@ -32,4 +32,4 @@ svg .MuiLineChart-highlight
 {
   stroke: rgba(255, 127, 0);
   fill: rgba(255, 127, 0);
-}
+} */
