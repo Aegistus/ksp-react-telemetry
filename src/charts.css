@@ -23,6 +23,11 @@ svg .MuiChartsAxis-label
   stroke: rgb(196, 196, 196);
 }
 
+svg .MuiChartsReferenceLine-label
+{
+  stroke: rgb(196, 196, 196);
+}
+
 /* svg .MuiLineChart-line
 {
   stroke: rgb(187, 93, 0);
