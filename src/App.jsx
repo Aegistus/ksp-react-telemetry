@@ -6,6 +6,10 @@ import { useKspTelemetry, TELEMETRY_FIELDS } from './useKspTelemetry.js'
 import CesiumViewer from './CesiumViewer.jsx'
 import LineGraph from './LineGraph.jsx'
 import SourceButton from './SourceButton.jsx'
+import BasicInfoWidget from './BasicInfoWidget.jsx'
+import TelemetryWidget from './TelemetryWidget.jsx'
+import OrbitInfoWidget from './OrbitInfoWidget.jsx'
+import DirectionWidget from './DirectionWidget.jsx'
 
 const defaultData = 
 {
@@ -30,7 +34,7 @@ const defaultData =
   universalTime: 0,
 }
 
-function formatTime(t) {
+export function formatTime(t) {
   const sign = t < 0 ? "-" : "+";
   const at = Math.abs(Math.round(t));
   const h = Math.floor(at / 3600).toString().padStart(2, "0");
@@ -39,7 +43,7 @@ function formatTime(t) {
   return `T${sign}${h}:${m}:${s}`;
 }
 
-function numberWithCommas(x) {
+export function numberWithCommas(x) {
     return x.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ",");
 }
 
@@ -79,23 +83,29 @@ function App() {
         <SourceButton currentSource={source} setSource={setSource}/>
       </WidgetPanel>
       <p>Connection Status: {connectionStatus}</p>
-      <WidgetPanel title= "Basic Info">
-        <ValueReadout title="Vessel Name">
-          { currentData.name }
-        </ValueReadout>
-        <ValueReadout title="MET"> 
-          { formatTime(currentData.missionTime) }
-        </ValueReadout>
-      </WidgetPanel>
-      <WidgetPanel title="Telemetry">
-        <ValueReadout title="Altitude" units= {TELEMETRY_FIELDS.altitude.unit}>
-          { numberWithCommas(currentData.altitude.toFixed(2)) }
-        </ValueReadout>
-      </WidgetPanel>
-      <WidgetPanel title="Altitude (m)">
-        <LineGraph dataSet={history} yDataKey={'altitude'} xLabel={"Time (s)"} yLabel={"Altitude (m)"} interval={5000}/>
-      </WidgetPanel>
-      {/* <CesiumViewer history={history} longitude={longitude} latitude={latitude} altitude={altitude}/> */}
+      <table>
+        <thead>
+          <tr>
+            <td className="main-table">
+              <BasicInfoWidget currentData={currentData}/>
+              <DirectionWidget currentData={currentData}/>
+            </td>
+            <td className="main-table">
+              <OrbitInfoWidget currentData={currentData}/>
+              <TelemetryWidget currentData={currentData}/>
+            </td>
+            <td className="main-table">
+              <WidgetPanel title="Altitude (m)">
+                <LineGraph dataSet={history} yDataKey={'altitude'} xLabel={"Time (s)"} yLabel={"Altitude (m)"} interval={5000}/>
+              </WidgetPanel>
+              <WidgetPanel title="Delta-V (m/s)">
+                <LineGraph dataSet={history} yDataKey={'deltaV'} xLabel={"Time (s)"} yLabel={"Delta-V (m/s)"} interval={100}/>
+              </WidgetPanel>
+            </td>
+          </tr>
+        </thead>
+      </table>
+      <CesiumViewer history={history} longitude={longitude} latitude={latitude} altitude={altitude}/>
       {/* <p>telemetry status: {status + " " + error}</p>
       <p>Mission phase: {data.phase}</p>
       <p>Altitude: {data.altitude} m</p>

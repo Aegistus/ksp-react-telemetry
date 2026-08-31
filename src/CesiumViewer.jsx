@@ -53,16 +53,18 @@ function CesiumViewer({history, longitude, latitude, altitude})
     ).current;
 
     return(
-        <Viewer>
-            {trailPositions.length >= 2 && (
-                <Entity>
-                    <PolylineGraphics positions={positionsProperty} width={2} material={PAST_POINT_COLOR}/>
+        <div className="cesium-viewer-holder">
+            <Viewer>
+                {trailPositions.length >= 2 && (
+                    <Entity>
+                        <PolylineGraphics positions={positionsProperty} width={2} material={PAST_POINT_COLOR}/>
+                    </Entity>
+                )}
+                <Entity position={position}>
+                    <PointGraphics pixelSize={10}/>
                 </Entity>
-            )}
-            <Entity position={position}>
-                <PointGraphics pixelSize={10}/>
-            </Entity>
-        </Viewer>
+            </Viewer>
+        </div>
     );
 }
 export default CesiumViewer;

@@ -145,3 +145,14 @@ input:checked + .slider::before
   padding-right: 10px;
   padding-left: 10px;
 }
+
+.cesium-viewer-holder
+{
+  min-width: 300px;
+}
+
+/*for items arranged on the main page */
+.main-table
+{
+  vertical-align: top;
+}
