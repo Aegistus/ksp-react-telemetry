@@ -1,10 +1,18 @@
 import WidgetPanel from "./WidgetPanel";
 import ValueReadout from "./ValueReadout";
 import { formatTime } from "./App";
-import { TELEMETRY_FIELDS } from "./useKspTelemetry";
+import { useEffect } from "react";
 
-function BasicInfoWidget({currentData})
+let maxStages = 0;
+
+function BasicInfoWidget({currentData, status})
 {
+    // record the max stage on first mount
+    useEffect(() => {
+        maxStages = Number(String(currentData.stages)[0]);
+    }, [status]);
+
+    let currentStage = Number(String(currentData.stages)[0]);
     return(
         <WidgetPanel title= "Basic Info">
             <ValueReadout title="Vessel Name">
@@ -14,10 +22,10 @@ function BasicInfoWidget({currentData})
                 { formatTime(currentData.missionTime) }
             </ValueReadout>
             <ValueReadout title="UT">
-                { currentData.universalTime }
+                { formatTime(currentData.universalTime) }
             </ValueReadout>
-            <ValueReadout title="Stages">
-                { currentData.stages }
+            <ValueReadout title="Stages" units={" /" + maxStages}>
+                { currentStage }
             </ValueReadout>
         </WidgetPanel>
     );

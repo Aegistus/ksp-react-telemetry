@@ -88,7 +88,7 @@ function App() {
         <thead>
           <tr>
             <td className="main-table">
-              <BasicInfoWidget currentData={currentData}/>
+              <BasicInfoWidget currentData={currentData} status={status}/>
               <DirectionWidget currentData={currentData}/>
             </td>
             <td className="main-table">

@@ -34,12 +34,6 @@ function ChartsWidget({history})
                 >
                     <LinePlot/>
                     <ChartsReferenceLine
-                        y={140000}
-                        label="Karman Line"
-                        lineStyle={{stroke:'white', strokeDasharray: "10 5"}}
-                        labelStyle={{fill: 'white'}}
-                    />
-                    <ChartsReferenceLine
                         y={20000}
                         label="Stratosphere"
                         lineStyle={{stroke:'white', strokeDasharray: "10 5"}}
