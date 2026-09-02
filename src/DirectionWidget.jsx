@@ -1,6 +1,5 @@
 import WidgetPanel from "./WidgetPanel";
 import ValueReadout from "./ValueReadout";
-import { numberWithCommas } from "./App";
 import { TELEMETRY_FIELDS } from "./useKspTelemetry";
 
 function DirectionWidget({currentData})

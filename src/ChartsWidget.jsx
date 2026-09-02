@@ -8,7 +8,6 @@ function ChartsWidget({history})
     return(
         <>
             <WidgetPanel title="Altitude (m)">
-                {/* <LineGraph dataSet={history} yDataKey={'altitude'} xLabel={"Time (s)"} yLabel={"Altitude (m)"} interval={5000}/> */}
                 <ChartsContainer
                     dataset={history}
                     xAxis={[{ 

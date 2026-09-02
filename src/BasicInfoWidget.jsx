@@ -7,7 +7,7 @@ let maxStages = 0;
 
 function BasicInfoWidget({currentData, status})
 {
-    // record the max stage on first mount
+    // record the max stage based on current stage on first mount/status change
     useEffect(() => {
         maxStages = Number(String(currentData.stages)[0]);
     }, [status]);

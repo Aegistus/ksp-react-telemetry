@@ -162,10 +162,10 @@ function createSimulatedLaunch() {
   const R = 600000; // Kerbin radius, m
   const MU = 3.5316e12; // Kerbin standard gravitational parameter
   const G0 = 9.81;
-  const TARGET_AP = 80000;
-  const ATMO_TOP = 70000;
+  const TARGET_AP = 150000;
+  const ATMO_TOP = 140000;
 
-  let s = { t: 0, pos: { x: 0, y: R }, vel: { x: 0, y: 0 }, phase: 'STANDBY', phaseEnterT: 0, stage2StartT: null, circBurnStartT: null, lastAccelG: 0, deltaVSpent: 0 };
+  let s = { t: 0, pos: { x: 0, y: R }, vel: { x: 0, y: 0 }, phase: 'STANDBY', phaseEnterT: 0, stage2StartT: null, circBurnStartT: null, lastAccelG: 0, deltaVSpent: 0, stage: 5 };
 
   function computeOrbit(pos, vel) {
     const r = Math.hypot(pos.x, pos.y);
@@ -197,26 +197,35 @@ function createSimulatedLaunch() {
       const horiz = { x: up.y, y: -up.x };
 
       if (s.phase === 'STANDBY') {
-        s.phase = 'ASCENT_S1'; s.phaseEnterT = s.t;
+        s.phase = 'ASCENT_S1';
+        s.phaseEnterT = s.t;
+        s.stage = 5;
       } else if (s.phase === 'ASCENT_S1' && s.t - s.phaseEnterT >= 42) {
         s.phase = 'STAGE_SEP'; s.phaseEnterT = s.t;
       } else if (s.phase === 'STAGE_SEP' && s.t - s.phaseEnterT >= 1.5) {
         s.phase = 'ASCENT_S2'; s.stage2StartT = s.t;
+        s.stage = 4;
       } else if (s.phase === 'ASCENT_S2') {
         const orbit = computeOrbit(s.pos, s.vel);
         const burnT = s.t - s.stage2StartT;
-        if ((orbit.apoapsis >= TARGET_AP && burnT > 10) || burnT > 160) s.phase = 'COAST';
+        if ((orbit.apoapsis >= TARGET_AP && burnT > 10) || burnT > 160)
+        {
+          s.phase = 'COAST';
+          s.stage = 3;
+        }
       } else if (s.phase === 'COAST') {
         const vAlt = s.vel.x * up.x + s.vel.y * up.y;
         const orbit = computeOrbit(s.pos, s.vel);
         if (Math.abs(vAlt) < 2 && altitude > orbit.apoapsis - 800) {
           s.phase = 'CIRC_BURN'; s.circBurnStartT = s.t;
+          s.stage = 2;
         }
       } else if (s.phase === 'CIRC_BURN') {
         const orbit = computeOrbit(s.pos, s.vel);
         const burnT = s.t - s.circBurnStartT;
         if (orbit.periapsis >= ATMO_TOP || burnT > 40) s.phase = 'ORBIT';
       } else if (s.phase === 'ORBIT') {
+        s.stage = 1;
         // mission complete — hold position, stop expending fuel
       }
 
@@ -266,17 +275,17 @@ function createSimulatedLaunch() {
       apoapsis: orbit.apoapsis,
       periapsis: orbit.periapsis,
       phase: s.phase,
-      latitude: -0.0972, // KSC's real latitude — this sim only flies in one plane
-      longitude: -74.5 + downrangeAngle,
+      latitude: 28.608391558118957, // Cape Canaveral's real latitude — this sim only flies in one plane
+      longitude: -80.59975911255418 + downrangeAngle,
       direction,
       pitch,
       roll: 0, // not modeled
       heading: 90, // due east — the standard equatorial launch heading, not modeled dynamically
       deltaV: Math.max(0, 4500 - s.deltaVSpent),
       name: 'Simulated Vessel',
-      stages: s.phase === 'STANDBY' || s.phase === 'ASCENT_S1' ? [1, 0] : [0],
+      stages: s.stage,
       missionTime: s.t, // demo mode's mission clock already starts at liftoff, same meaning as live MET
-      universalTime: 3600 * 24 * 120 + s.t, // an arbitrary "day 120 of the game" epoch — decorative only
+      universalTime: 43200 + s.t, // starts at 12 noon.
     };
   }
 
