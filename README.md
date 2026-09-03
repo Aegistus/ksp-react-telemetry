@@ -1,8 +1,6 @@
-# Kerbal Space Program React Telemetry.
+# Kerbal Space Program React Telemetry App
 
-This is a React app that allows you to view live telemetry data from Kerbal Space Program externally. It includes basic readouts, charts, and a 3D viewer powered by Cesium.
-
-Currently, two official plugins are available:
+This is a React app that allows you to view live telemetry data from Kerbal Space Program externally. It includes basic readouts, charts, and a 3D world viewer powered by Cesium.
 
 ## How to Use
 
