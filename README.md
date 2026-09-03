@@ -1,16 +1,11 @@
-# React + Vite
+# Kerbal Space Program React Telemetry.
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+This is a React app that allows you to view live telemetry data from Kerbal Space Program externally. It includes basic readouts, charts, and a 3D viewer powered by Cesium.
 
 Currently, two official plugins are available:
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## How to Use
 
-## React Compiler
+`cd bridge` and `npm run start` to start the bridge program from KSP to React (make sure that KSP is on and that you are on the launch pad).
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+`npm run dev` to start the React App. From here you can run a demo simulation or stream data live as long as the bridge is up and running.
